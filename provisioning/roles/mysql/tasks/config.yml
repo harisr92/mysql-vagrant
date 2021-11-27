@@ -1,0 +1,16 @@
+---
+- name: MySQL | start
+  service:
+    name: mysql
+    state: restarted
+
+- name: MySQL | Create User
+  shell: |
+    mysql -NBe "CREATE USER 'root'@'%' IDENTIFIED BY '{{ root_password }}';"
+
+- name: MySQL | Grant privileges
+  shell: |
+    mysql -NBe "GRANT ALL PRIVILEGES ON *.* TO 'root'@'{{ item }}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+  with_items:
+    - localhost
+    - '%'
