@@ -6,12 +6,6 @@
     update_cache: yes
   register: install
 
-- name: MySQL | Delete conf
-  file:
-    path: /etc/mysql/mysql.conf.d/mysqld.cnf
-    state: absent
-  when: install.changed
-
 - name: MySQL | mysqld Configure
   template:
     src: mysqld.cnf.j2

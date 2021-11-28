@@ -4,6 +4,7 @@
 tmp/
 
 data/
+mysql-data/
 .vagrant/
 gmon.out
 .env

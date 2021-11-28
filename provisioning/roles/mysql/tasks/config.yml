@@ -1,12 +1,7 @@
 ---
-- name: MySQL | start
-  service:
-    name: mysql
-    state: restarted
-
 - name: MySQL | Create User
   shell: |
-    mysql -NBe "CREATE USER 'root'@'%' IDENTIFIED BY '{{ root_password }}';"
+    mysql -NBe "CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '{{ root_password }}';"
 
 - name: MySQL | Grant privileges
   shell: |
@@ -14,3 +9,32 @@
   with_items:
     - localhost
     - '%'
+
+- name: MySQL | Stop
+  service:
+    name: mysql
+    daemon_reload: yes
+    state: stopped
+
+- name: MySQL | Data dir
+  shell: |
+    rsync -av /var/lib/mysql "{{ data_base_path }}"
+  args:
+    creates: "{{ data_dir }}"
+
+- name: Apparmor | update alias
+  template:
+    src: apparmor-alias.j2
+    dest: /etc/apparmor.d/tunables/alias
+
+- name: Apparmor | restart
+  service:
+    name: apparmor
+    state: restarted
+
+- name: MySQL | start
+  service:
+    name: mysql
+    state: started
+    enabled: true
+  ignore_errors: yes
